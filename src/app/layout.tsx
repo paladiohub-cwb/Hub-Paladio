@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const montSans = Montserrat({
@@ -19,7 +20,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className={`${montSans.variable} antialiased`}>{children}</body>
+      <body className={`${montSans.variable} antialiased`}>
+        {children} <Toaster richColors position="top-right" />{" "}
+      </body>
     </html>
   );
 }
