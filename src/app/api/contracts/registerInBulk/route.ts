@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-
+import clientPromise from "@/lib/mongodb";
 import type { Contrato } from "@/interface/contracts";
-
 import { contratoSchema } from "@/lib/schemas/contracts";
-
-import { readDBCONTRATOS, writeCONTRATOS } from "@/lib/db";
 import { convertStringInNumber } from "@/utils/convertStringInNumber";
 
 export async function POST(req: NextRequest) {
@@ -22,14 +19,18 @@ export async function POST(req: NextRequest) {
     const failures: { index: number; errors: string[]; original: unknown }[] =
       [];
 
-    // Lê os contratos existentes uma única vez para checar duplicatas
-    const existingContratos = readDBCONTRATOS();
+    // conecta no banco
+    const client = await clientPromise;
+    const db = client.db("hub"); // nome do banco
+    const collection = db.collection<Contrato>("contratos");
+
+    // contratos já cadastrados
+    const existingContratos = await collection.find().toArray();
 
     for (const [index, raw] of items.entries()) {
       const parsed = contratoSchema.safeParse(raw);
 
       if (parsed.success) {
-        // --- INÍCIO DA NOVA TRATIVA ---
         const isDuplicate = existingContratos.some(
           (existing) =>
             existing.contrato === parsed.data.contrato &&
@@ -37,56 +38,32 @@ export async function POST(req: NextRequest) {
         );
 
         if (isDuplicate) {
-          console.warn(
-            `Tentativa de cadastrar duplicata: contrato ${parsed.data.contrato}, parcela ${parsed.data.parcela}.`
-          );
           failures.push({
             index,
             errors: ["Contrato e Parcela já cadastrados."],
             original: raw,
           });
-          continue; // Pula para a próxima iteração do loop
+          continue;
         }
-        // --- FIM DA NOVA TRATIVA ---
 
-        // Trativa existente para "Taxa Compartilhada"
-        // if (
-        //   parsed.data.status === "Taxa Compartilhada" &&
-        //   parsed.data.comissao === 0
-        // ) {
-        //   console.warn(
-        //     `Contrato de Taxa Compartilhada com comissão zero não será cadastrado ${parsed.data.contrato}.`
-        //   );
-        //   failures.push({
-        //     index,
-        //     errors: [
-        //       "Contrato de Taxa Compartilhada com comissão zero não será cadastrado.",
-        //     ],
-        //     original: raw,
-        //   });
-        // }
-
-        //PUXAAAAR DO BANCO COM UM FIND CONTRATO, E DEPOIS FAZER UM FILTER
         const parcelasExistentes = existingContratos
           .filter((c) => c.contrato === parsed.data.contrato)
           .map((c) => c.parcela);
 
-        // Se não houver nenhuma parcela existente, consideramos a última como 0
         const ultimaParcela =
           parcelasExistentes.length > 0 ? Math.max(...parcelasExistentes) : 0;
 
-        // Só gera aviso se houver pulo de parcela
+        // exemplo: se quiser validar salto de parcela
         // if (parsed.data.parcela > ultimaParcela + 1) {
-        //   parsed.data.aviso = `A última parcela deste contrato foi a parcela de número ${ultimaParcela}, pulando o cadastro neste lote para a parcela ${parsed.data.parcela}. Parcelas faltando.`;
+        //   parsed.data.aviso = `Última parcela deste contrato foi ${ultimaParcela}, você pulou para ${parsed.data.parcela}`;
         // }
 
         const creditoAtualizadoNumber = convertStringInNumber(
           parsed.data.creditoAtualizado
         );
-        // const doubleCheckValue = creditoAtualizadoNumber * parsed.data.comissao;
-        // parsed.data.doubleCheckValue = doubleCheckValue;
+        parsed.data.creditoAtualizado = creditoAtualizadoNumber as any;
+
         newContratos.push(parsed.data);
-        // FIM --- TRATATIVA TAXA COMPARTILHADA ---//
       } else {
         const zErrors = parsed.error.issues.map((e) => {
           const path = e.path.length ? e.path.join(".") : "item";
@@ -97,8 +74,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (newContratos.length > 0) {
-      const updatedContratos: any = [...existingContratos, ...newContratos];
-      writeCONTRATOS(updatedContratos);
+      await collection.insertMany(newContratos);
     }
 
     if (failures.length === 0) {

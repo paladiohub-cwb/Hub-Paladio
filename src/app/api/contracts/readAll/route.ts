@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readDBCONTRATOS } from "@/lib/db";
+import clientPromise from "@/lib/mongodb";
 import { Contrato } from "@/interface/contracts";
 
 function agruparContratos(contratos: Contrato[]) {
@@ -9,7 +9,6 @@ function agruparContratos(contratos: Contrato[]) {
     const id = contrato.contrato.toString();
 
     if (!grouped[id]) {
-      // Cria o objeto agrupado pela primeira vez, guardando os detalhes originais
       grouped[id] = {
         contrato: contrato.contrato,
         cliente: contrato.nomeDoCliente,
@@ -18,7 +17,6 @@ function agruparContratos(contratos: Contrato[]) {
         credito: contrato.creditoAtualizado,
         total: 0,
         categorias: {} as Record<string, number>,
-        // Adiciona uma nova propriedade com os dados originais
         detalhes: contrato,
       };
     }
@@ -32,7 +30,20 @@ function agruparContratos(contratos: Contrato[]) {
 }
 
 export async function GET() {
-  const contratos: Contrato[] = readDBCONTRATOS();
-  const agrupados = agruparContratos(contratos);
-  return NextResponse.json(agrupados);
+  try {
+    const client = await clientPromise;
+    const db = client.db("hub"); // nome do banco
+    const collection = db.collection<Contrato>("contratos");
+
+    const contratos = await collection.find().toArray();
+    const agrupados = agruparContratos(contratos);
+
+    return NextResponse.json(agrupados);
+  } catch (err: any) {
+    console.error("❌ Erro no GET contratos:", err);
+    return NextResponse.json(
+      { error: err?.message ?? "Erro interno" },
+      { status: 500 }
+    );
+  }
 }

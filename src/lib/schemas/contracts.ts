@@ -13,7 +13,7 @@ export const rawContratoSchema = z.object({
     (v) => (v == null ? "" : String(v).trim()),
     z.string().min(1)
   ),
-  "Valor bruto": z.preprocess((v) => toNumber(v), z.number().min(0)),
+  "Valor bruto": z.preprocess((v) => toNumber(v), z.number()),
   "% comissão": z.preprocess((v) => toDecimal(v), z.number().min(0).max(100)),
   "Nome ponto de venda": z.preprocess(
     (v) => (v == null ? "" : String(v).trim()),
