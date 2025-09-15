@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import {
   Drawer,
   DrawerContent,
@@ -18,6 +19,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -89,8 +91,8 @@ export default function ContratosTable() {
             <TableHead>Vendedor</TableHead>
             <TableHead>Parcela</TableHead>
             <TableHead>Crédito</TableHead>
-            <TableHead>Total</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Total</TableHead>
             {categorias.map((cat) => (
               <TableHead key={cat}>{cat}</TableHead>
             ))}
@@ -101,17 +103,17 @@ export default function ContratosTable() {
             <TableRow
               key={c.contrato}
               onClick={() => handleRowClick(c)}
-              className="cursor-pointer hover:bg-gray-100"
+              className="cursor-pointer hover:bg-gray-400"
             >
               <TableCell className="font-bold">{c.contrato}</TableCell>
               <TableCell>{c.cliente}</TableCell>
               <TableCell>{c.vendedor}</TableCell>
               <TableCell>{c.parcela}</TableCell>
               <TableCell>{c.credito}</TableCell>
+              <TableCell>{c.detalhes.status}</TableCell>
               <TableCell className="font-bold text-green-500">
                 R${c.total.toLocaleString("pt-BR")}
               </TableCell>
-              <TableCell>{c.detalhes.status}</TableCell>
               {categorias.map((cat) => (
                 <TableCell key={cat}>
                   R${(c.categorias[cat] || 0).toLocaleString("pt-BR")}

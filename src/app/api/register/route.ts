@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { addUser } from "@/lib/db";
+import clientPromise from "@/lib/mongodb";
 import { registerSchema } from "@/lib/schemas/register";
 
 export async function POST(req: Request) {
@@ -7,9 +7,14 @@ export async function POST(req: Request) {
     const body = await req.json();
     const data = registerSchema.parse(body);
 
-    addUser(data);
+    const client = await clientPromise;
+    const db = client.db("hub"); // nome do banco que você quer usar
+    const result = await db.collection("users").insertOne(data);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      userId: result.insertedId,
+    });
   } catch (error: any) {
     if (error.name === "ZodError") {
       return NextResponse.json(

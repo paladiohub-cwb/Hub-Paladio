@@ -5,6 +5,7 @@ import type { Contrato } from "@/interface/contracts";
 import { contratoSchema } from "@/lib/schemas/contracts";
 
 import { readDBCONTRATOS, writeCONTRATOS } from "@/lib/db";
+import { convertStringInNumber } from "@/utils/convertStringInNumber";
 
 export async function POST(req: NextRequest) {
   try {
@@ -49,44 +50,42 @@ export async function POST(req: NextRequest) {
         // --- FIM DA NOVA TRATIVA ---
 
         // Trativa existente para "Taxa Compartilhada"
-        if (
-          parsed.data.status === "Taxa Compartilhada" &&
-          parsed.data.comissao === 0
-        ) {
-          console.warn(
-            `Contrato de Taxa Compartilhada com comissão zero não será cadastrado ${parsed.data.contrato}.`
-          );
-          failures.push({
-            index,
-            errors: [
-              "Contrato de Taxa Compartilhada com comissão zero não será cadastrado.",
-            ],
-            original: raw,
-          });
-        } else {
-          // --- NOVA TRATIVA: verificar pulos de parcelas ---
-          // Pega todas as parcelas existentes para este contrato
+        // if (
+        //   parsed.data.status === "Taxa Compartilhada" &&
+        //   parsed.data.comissao === 0
+        // ) {
+        //   console.warn(
+        //     `Contrato de Taxa Compartilhada com comissão zero não será cadastrado ${parsed.data.contrato}.`
+        //   );
+        //   failures.push({
+        //     index,
+        //     errors: [
+        //       "Contrato de Taxa Compartilhada com comissão zero não será cadastrado.",
+        //     ],
+        //     original: raw,
+        //   });
+        // }
 
-          //PUXAAAAR DO BANCO COM UM FIND CONTRATO, E DEPOIS FAZER UM FILTER
-          const parcelasExistentes = existingContratos
-            .filter((c) => c.contrato === parsed.data.contrato)
-            .map((c) => c.parcela);
+        //PUXAAAAR DO BANCO COM UM FIND CONTRATO, E DEPOIS FAZER UM FILTER
+        const parcelasExistentes = existingContratos
+          .filter((c) => c.contrato === parsed.data.contrato)
+          .map((c) => c.parcela);
 
-          // Se não houver nenhuma parcela existente, consideramos a última como 0
-          const ultimaParcela =
-            parcelasExistentes.length > 0 ? Math.max(...parcelasExistentes) : 0;
+        // Se não houver nenhuma parcela existente, consideramos a última como 0
+        const ultimaParcela =
+          parcelasExistentes.length > 0 ? Math.max(...parcelasExistentes) : 0;
 
-          console.log(parcelasExistentes);
-          console.log(ultimaParcela, "foi a ultima parcela");
+        // Só gera aviso se houver pulo de parcela
+        // if (parsed.data.parcela > ultimaParcela + 1) {
+        //   parsed.data.aviso = `A última parcela deste contrato foi a parcela de número ${ultimaParcela}, pulando o cadastro neste lote para a parcela ${parsed.data.parcela}. Parcelas faltando.`;
+        // }
 
-          // Só gera aviso se houver pulo de parcela
-          if (parsed.data.parcela > ultimaParcela + 1) {
-            parsed.data.aviso = `A última parcela deste contrato foi a parcela de número ${ultimaParcela}, pulando o cadastro neste lote para a parcela ${parsed.data.parcela}. Parcelas faltando.`;
-          }
-
-          newContratos.push(parsed.data);
-        }
-
+        const creditoAtualizadoNumber = convertStringInNumber(
+          parsed.data.creditoAtualizado
+        );
+        const doubleCheckValue = creditoAtualizadoNumber * parsed.data.comissao;
+        parsed.data.doubleCheckValue = doubleCheckValue;
+        newContratos.push(parsed.data);
         // FIM --- TRATATIVA TAXA COMPARTILHADA ---//
       } else {
         const zErrors = parsed.error.issues.map((e) => {

@@ -43,6 +43,7 @@ export const rawContratoSchema = z.object({
     z.string().min(1)
   ),
   aviso: z.string().optional(),
+  doubleCheckValue: z.number(),
 });
 
 // Zod schema que faz o 'transform' para nomes limpos (camelCase)
@@ -63,4 +64,5 @@ export const contratoSchema = rawContratoSchema.transform((data) => ({
   nomeDoCliente: data["Nome do Cliente"],
   categoria: data.Categoria,
   aviso: data.aviso,
+  doubleCheckValue: data.doubleCheckValue,
 }));
