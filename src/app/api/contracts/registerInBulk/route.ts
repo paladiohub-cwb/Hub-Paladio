@@ -83,8 +83,8 @@ export async function POST(req: NextRequest) {
         const creditoAtualizadoNumber = convertStringInNumber(
           parsed.data.creditoAtualizado
         );
-        const doubleCheckValue = creditoAtualizadoNumber * parsed.data.comissao;
-        parsed.data.doubleCheckValue = doubleCheckValue;
+        // const doubleCheckValue = creditoAtualizadoNumber * parsed.data.comissao;
+        // parsed.data.doubleCheckValue = doubleCheckValue;
         newContratos.push(parsed.data);
         // FIM --- TRATATIVA TAXA COMPARTILHADA ---//
       } else {
