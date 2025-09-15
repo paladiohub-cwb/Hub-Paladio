@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-
+import { Contrato } from "@/interface/contracts";
 const DB_FILE = path.join(process.cwd(), "src/mocks/db.json");
 const DB_CONTRATOS = path.join(process.cwd(), "src/mocks/dbCONTRATOS.json");
 
@@ -9,23 +9,6 @@ export type User = {
   email: string;
   password: string;
   cargo: string;
-};
-export type Contrato = {
-  Status: string;
-  "Valor bruto": number;
-  "% comissão": number;
-  "Nome ponto de venda": string;
-  Grupo: number;
-  Cota: number;
-  Segmento: string;
-  Contrato: number;
-  "Crédito atualizado": string;
-  Vendedor: number;
-  Equipe: number;
-  "Data da venda": string; // ISO yyyy-mm-dd
-  Parcela: number;
-  "Nome do Cliente": string;
-  Categoria: string;
 };
 
 function readDB(): User[] {
@@ -36,7 +19,7 @@ function readDB(): User[] {
   return JSON.parse(data) as User[];
 }
 
-function readDBCONTRATOS(): Contrato[] {
+export function readDBCONTRATOS(): Contrato[] {
   if (!fs.existsSync(DB_CONTRATOS)) {
     fs.writeFileSync(DB_CONTRATOS, JSON.stringify([]));
     return [];
@@ -59,7 +42,7 @@ function readDBCONTRATOS(): Contrato[] {
   }
 }
 
-function writeCONTRATOS(contratos: Contrato[]) {
+export function writeCONTRATOS(contratos: Contrato[]) {
   fs.writeFileSync(DB_CONTRATOS, JSON.stringify(contratos, null, 2));
 }
 

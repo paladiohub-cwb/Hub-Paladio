@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import ContratosTable from "@/components/contracts/ContractsTable";
 
 export default function Relatorios() {
   const [jsonData, setJsonData] = useState<any[]>([]);
@@ -109,6 +110,11 @@ export default function Relatorios() {
         <Button variant="default" onClick={handleSendToAPI} disabled={loading}>
           {loading ? `Enviando... ${progress}%` : "Registrar contratos"}
         </Button>
+      </div>
+
+      <div className="p-8">
+        <h1 className="text-xl font-bold mb-4">Relatórios</h1>
+        <ContratosTable />
       </div>
     </div>
   );
