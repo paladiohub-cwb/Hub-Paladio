@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Bruno",
+    "email": "bruno@hub.com",
+    "password": "123123",
+    "cargo": "GESTOR"
+  },
+  {
+    "name": "Bruno",
+    "email": "bruno@mail.com",
+    "password": "123123",
+    "cargo": "GESTOR"
+  }
+]

@@ -17,7 +17,7 @@ export default async function HomePage() {
           <form action={logout}>
             <Button
               type="submit"
-              className="w-full bg-muted text-accent hover:bg-secondary"
+              className="w-full  text-accent bg-red-600 hover:bg-secondary"
             >
               Sair
             </Button>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
+import { Navbar } from "@/components/navbar";
 
 const montSans = Montserrat({
   variable: "--font-mont-sans",
@@ -21,6 +22,7 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body className={`${montSans.variable} antialiased`}>
+        <Navbar />
         {children} <Toaster richColors position="top-right" />{" "}
       </body>
     </html>

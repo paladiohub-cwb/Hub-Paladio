@@ -1,3 +1,7 @@
 export default function Home() {
-  return <h1>oi</h1>;
+  return (
+    <>
+      <main>maaa oe</main>
+    </>
+  );
 }
