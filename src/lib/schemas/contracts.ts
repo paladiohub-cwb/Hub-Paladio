@@ -1,27 +1,12 @@
-// /lib/schemas/contracts.ts (exemplo)
 import { z } from "zod";
 import {
   parseDateToISO,
   toInt,
   toNumber,
-  toPercentage,
   toDecimal,
 } from "@/utils/contractsRegister";
 
-/**
- * Helper: prepara um número usando sua função utilitária (toInt/toNumber/etc).
- * Se o util retornar algo não-numérico, devolve NaN — assim conseguimos detectar
- * depois com .refine(...) e devolver mensagem amigável.
- */
-const numberPreprocess = (fn: (v: unknown) => number) => (v: unknown) => {
-  if (v === null || v === undefined || v === "") return undefined;
-  try {
-    const n = fn(v);
-    return Number.isFinite(n) ? n : undefined;
-  } catch {
-    return undefined;
-  }
-};
+import { numberPreprocess } from "@/utils/contractsRegister";
 
 export const rawContratoSchema = z.object({
   Status: z.preprocess(
@@ -97,7 +82,7 @@ export const rawContratoSchema = z.object({
   ),
 
   "Data da venda": z.preprocess(
-    (v) => parseDateToISO(v), // parseDateToISO deve retornar string ISO ou falsy
+    (v) => parseDateToISO(v),
     z.string().refine((s) => !!s, { message: "Data da venda inválida" })
   ),
 
@@ -123,7 +108,6 @@ export const rawContratoSchema = z.object({
   aviso: z.string().optional(),
 });
 
-// transforma para camelCase (mantendo mensagens do raw schema)
 export const contratoSchema = rawContratoSchema.transform((data) => ({
   status: data.Status,
   valorBruto: data["Valor bruto"],

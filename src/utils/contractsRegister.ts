@@ -88,3 +88,20 @@ export function parseDateToISO(value: unknown): string | null {
   }
   return null;
 }
+
+/**
+ * Helper: prepara um número usando sua função utilitária (toInt/toNumber/etc).
+ * Se o util retornar algo não-numérico, devolve NaN — assim conseguimos detectar
+ * depois com .refine(...) e devolver mensagem amigável.
+ */
+
+export const numberPreprocess =
+  (fn: (v: unknown) => number) => (v: unknown) => {
+    if (v === null || v === undefined || v === "") return undefined;
+    try {
+      const n = fn(v);
+      return Number.isFinite(n) ? n : undefined;
+    } catch {
+      return undefined;
+    }
+  };

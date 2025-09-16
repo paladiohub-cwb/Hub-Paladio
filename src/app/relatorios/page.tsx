@@ -59,12 +59,17 @@ export default function Relatorios() {
             .map((f: any) => (f.errors ?? []).join("; "))
             .join(" | ");
 
+          const contractNumber = (errorData.failures ?? []).map(
+            (contract: any) => contract.original.Contrato
+          );
+
+          console.log(contractNumber);
           setErrors((prev) => [
             ...prev,
             {
               index: i + 1,
               error: errorData.message
-                ? `${errorData.message} — ${messageFailures}`
+                ? `${errorData.message} — ${messageFailures} - N° de Contrato: ${contractNumber}`
                 : messageFailures || "Erro desconhecido",
               contrato,
             },
