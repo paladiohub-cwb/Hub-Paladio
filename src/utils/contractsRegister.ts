@@ -88,3 +88,36 @@ export function parseDateToISO(value: unknown): string | null {
   }
   return null;
 }
+
+/**
+ * Helper: prepara um número usando sua função utilitária (toInt/toNumber/etc).
+ * Se o util retornar algo não-numérico, devolve NaN — assim conseguimos detectar
+ * depois com .refine(...) e devolver mensagem amigável.
+ */
+
+export const numberPreprocess =
+  (fn: (v: unknown) => number) => (v: unknown) => {
+    if (v === null || v === undefined || v === "") return undefined;
+    try {
+      const n = fn(v);
+      return Number.isFinite(n) ? n : undefined;
+    } catch {
+      return undefined;
+    }
+  };
+
+export function parseBrazilianCurrencyToNumber(input: unknown): number {
+  if (typeof input === "number") return input;
+  const s = String(input ?? "").trim();
+  if (!s) return NaN;
+
+  // Remove tudo que não seja dígito, vírgula, ponto ou sinal negativo
+  // Em seguida remove os pontos (milhares) e converte a vírgula decimal para ponto
+  const cleaned = s
+    .replace(/[^\d,\-\.]/g, "") // tira "R$ ", espaços, letras, etc
+    .replace(/\./g, "") // remove separador de milhar
+    .replace(/,/g, "."); // vírgula decimal -> ponto
+
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : NaN;
+}
