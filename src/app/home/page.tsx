@@ -7,7 +7,6 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-primary text-accent">
-      <Navbar />
       <div className="flex items-center justify-center p-10">
         <div className="w-[400px] bg-primary text-accent rounded-lg shadow-lg p-6 text-center">
           <h1 className="text-2xl font-bold mb-4">Bem-vindo, {userName} 👋</h1>
@@ -17,7 +16,7 @@ export default async function HomePage() {
           <form action={logout}>
             <Button
               type="submit"
-              className="w-full bg-muted text-accent hover:bg-secondary"
+              className="w-full  text-accent bg-red-600 hover:bg-secondary"
             >
               Sair
             </Button>

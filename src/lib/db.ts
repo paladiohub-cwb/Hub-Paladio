@@ -1,9 +1,10 @@
 import fs from "fs";
 import path from "path";
+import { Contrato } from "@/interface/contracts";
+const DB_FILE = path.join(process.cwd(), "src/mocks/db.json");
+const DB_CONTRATOS = path.join(process.cwd(), "src/mocks/dbCONTRATOS.json");
 
-const DB_FILE = path.join(process.cwd(), "db.json");
-
-type User = {
+export type User = {
   name: string;
   email: string;
   password: string;
@@ -18,6 +19,38 @@ function readDB(): User[] {
   return JSON.parse(data) as User[];
 }
 
+export function readDBCONTRATOS(): Contrato[] {
+  if (!fs.existsSync(DB_CONTRATOS)) {
+    fs.writeFileSync(DB_CONTRATOS, JSON.stringify([]));
+    return [];
+  }
+
+  const data = fs.readFileSync(DB_CONTRATOS, "utf-8").trim();
+
+  if (!data) {
+    // Se o arquivo estiver vazio, corrige
+    fs.writeFileSync(DB_CONTRATOS, JSON.stringify([]));
+    return [];
+  }
+
+  try {
+    return JSON.parse(data) as Contrato[];
+  } catch (err) {
+    console.error("Arquivo dbCONTRATOS.json corrompido. Resetando...");
+    fs.writeFileSync(DB_CONTRATOS, JSON.stringify([]));
+    return [];
+  }
+}
+
+export function writeCONTRATOS(contratos: Contrato[]) {
+  fs.writeFileSync(DB_CONTRATOS, JSON.stringify(contratos, null, 2));
+}
+
+export function createCONTRACTS(contrato: Contrato) {
+  const contracts = readDBCONTRATOS();
+  contracts.push(contrato);
+  writeCONTRATOS(contracts);
+}
 function writeDB(users: User[]) {
   fs.writeFileSync(DB_FILE, JSON.stringify(users, null, 2));
 }
