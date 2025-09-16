@@ -1,4 +1,3 @@
-// Tipagem do contrato com nomes 'sujos'
 export interface RawContrato {
   Status: string;
   "Valor bruto": number;
@@ -19,7 +18,7 @@ export interface RawContrato {
 }
 
 export interface Contrato {
-  _id?: string; // se vier do Mongo
+  _id?: string;
   status: string;
   valorBruto: number;
   comissao: number;

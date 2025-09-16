@@ -34,3 +34,21 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+indicador vira usuario
+cada vendedor uma regra
+
+==============atualiza o CONTRATO=============
+
+DEPOIS QUE FAZER O CRUD DE REGRAS, ALTERAR A ROTA DE API GET DE CONTRATOS, PARA OS CALCULOS,
+
+====categorias====
+lic150
+lic100
+lic80
+aut200 que é igual vendedor 2% => regra
+lic ==> regra
+
+categorias cadas uma coleection regra
+
+categoria umaPraMuitas

@@ -1,16 +1,37 @@
 import { z } from "zod";
 
-const CARGOS = ["CONSULTOR", "SUPERVISOR", "GESTOR"] as const;
-type Cargo = (typeof CARGOS)[number];
+const CARGOS = [
+  "CONSULTOR",
+  "GESTOR",
+  "SUPERVISOR",
+  "AUTORIZADO",
+  "LICENCIADO",
+] as const;
+
+function normalizeCargo(cargo: string): string {
+  const upper = cargo.toUpperCase();
+  if (upper === "SUPERVISOR" || upper === "AUTORIZADO") return "GESTOR";
+  if (upper === "LICENCIADO") return "CONSULTOR"; // exemplo
+  return upper;
+}
 
 export const registerSchema = z.object({
   id: z.string().uuid({ message: "ID deve ser um UUID válido." }).optional(),
-  name: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
+  nome: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
   email: z.string().email({ message: "E-mail inválido" }),
+  cod: z.number({ message: "Apenas números." }),
+  codSupervisor: z.number({ message: "Apenas números." }).optional(),
   password: z
     .string()
     .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
-  cargo: z.enum(CARGOS, { message: "Cargo inválido" }),
+  cargo: z
+    .preprocess(
+      (val) => (typeof val === "string" ? normalizeCargo(val) : val),
+      z.enum(CARGOS, { message: "Cargo inválido" })
+    )
+    .default("CONSULTOR"),
+  ativo: z.boolean().default(true).optional(),
+  comissao: z.number({ message: "Apenas números" }).default(0.02).optional(),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
@@ -21,3 +42,29 @@ export const loginSchema = z.object({
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
+
+const storeUserSchema = z.object({
+  _id: z.string().optional(),
+  idUser: z.string().optional(),
+  idStore: z.string().optional(),
+  cod: z.number({ message: "Apenas números." }),
+  cargo: z.enum(CARGOS).refine((cargo) => cargo.toUpperCase()),
+  storeName: z.string(),
+  userName: z.string(),
+  codSupervisor: z.number({ message: "Apenas números" }).optional(),
+});
+
+export const registerInBulkSchema = z.object({
+  id: z.string().uuid({ message: "ID deve ser um UUID válido." }).optional(),
+  nome: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
+  email: z.string().email({ message: "E-mail inválido" }),
+  password: z
+    .string()
+    .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
+  cargo: z.enum(CARGOS, { message: "Cargo inválido" }).default("CONSULTOR"),
+  ativo: z.boolean().default(true).optional(),
+  comissao: z.number().default(0.02).optional(),
+  stores: z.array(storeUserSchema).nonempty({
+    message: "É necessário pelo menos uma loja.",
+  }),
+});

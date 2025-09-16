@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { registerSchema } from "@/lib/schemas/register";
 import bcrypt from "bcryptjs";
+import { UserType } from "@/interface/users";
 
 const DB_NAME = "hub";
 const COLLECTION = "users";
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
     const db = client.db(DB_NAME);
     const collection = db.collection(COLLECTION);
 
-    const existing = await collection.findOne({ email: data.email });
+    const existing = await collection.findOne<UserType>({ email: data.email });
 
     if (existing) {
       return NextResponse.json({ error: "Usuário já existe" }, { status: 400 });
