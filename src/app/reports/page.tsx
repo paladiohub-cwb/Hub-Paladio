@@ -11,7 +11,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 export default function Relatorios() {
   const [jsonData, setJsonData] = useState<any[]>([]);
@@ -130,8 +130,7 @@ export default function Relatorios() {
   };
 
   return (
-    <div className="w-7xl bg-[rgba(255,255,255,0.1)] relative m-auto p-4 rounded-2xl" >
-
+    <div className="w-7xl bg-[rgba(255,255,255,0.1)] relative m-auto p-4 rounded-2xl">
       <h1>Upload de Relatórios</h1>
       <Button
         variant="destructive"
@@ -156,8 +155,8 @@ export default function Relatorios() {
             style={{ width: `${progress}%` }}
           ></div>
         </div>
-    
-      <div className="flex justify-center items-center ">
+      )}
+
       {errors.length > 0 && (
         <div className="bg-red-100 border border-red-400 text-red-800 p-4 rounded mt-4">
           <h2 className="font-bold mb-2">Erros encontrados:</h2>
@@ -181,71 +180,68 @@ export default function Relatorios() {
       )}
 
       <div className="flex justify-center items-center mt-4">
-
         <Button variant="default" onClick={handleSendToAPI} disabled={loading}>
           {loading ? `Enviando... ${progress}%` : "Registrar contratos"}
         </Button>
       </div>
 
       <div className="flex items-center gap-4 mb-4">
+        <div className="flex gap-2 items-center">
+          Selecione a loja:
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Loja" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="cajuru">Cajuru</SelectItem>
+              <SelectItem value="boa vista">Boa Vista</SelectItem>
+              <SelectItem value="curitiba">Curitiba</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-            <div className="flex gap-2 items-center">
-              Selecione a loja: 
-              <Select>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Loja" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cajuru">Cajuru</SelectItem>
-                  <SelectItem value="boa vista">Boa Vista</SelectItem>
-                  <SelectItem value="curitiba">Curitiba</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <div className="flex gap-2 items-center">
+          Mês:
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Mês" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Janeiro">Janeiro</SelectItem>
+              <SelectItem value="Fevereiro">Fevereiro</SelectItem>
+              <SelectItem value="Março">Março</SelectItem>
+              <SelectItem value="Abril">Abril</SelectItem>
+              <SelectItem value="Maio">Maio</SelectItem>
+              <SelectItem value="Junho">Junho</SelectItem>
+              <SelectItem value="Julho">Julho</SelectItem>
+              <SelectItem value="Agosto">Agosto</SelectItem>
+              <SelectItem value="Setembro">Setembro</SelectItem>
+              <SelectItem value="Outubro">Outubro</SelectItem>
+              <SelectItem value="Novembro">Novembro</SelectItem>
+              <SelectItem value="Dezembro">Dezembro</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-            <div className="flex gap-2 items-center">
-              Mês: 
-              <Select>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Mês" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Janeiro">Janeiro</SelectItem>
-                  <SelectItem value="Fevereiro">Fevereiro</SelectItem>
-                  <SelectItem value="Março">Março</SelectItem>
-                  <SelectItem value="Abril">Abril</SelectItem>
-                  <SelectItem value="Maio">Maio</SelectItem>
-                  <SelectItem value="Junho">Junho</SelectItem>
-                  <SelectItem value="Julho">Julho</SelectItem>
-                  <SelectItem value="Agosto">Agosto</SelectItem>
-                  <SelectItem value="Setembro">Setembro</SelectItem>
-                  <SelectItem value="Outubro">Outubro</SelectItem>
-                  <SelectItem value="Novembro">Novembro</SelectItem>
-                  <SelectItem value="Dezembro">Dezembro</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+        <div className="flex gap-2 items-center">
+          Ano:
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Ano" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="2025">2025</SelectItem>
+              <SelectItem value="2024">2024</SelectItem>
+              <SelectItem value="2023">2023</SelectItem>
+              <SelectItem value="2022">2022</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-            <div className="flex gap-2 items-center">
-              Ano: 
-              <Select>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Ano" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2025">2025</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                  <SelectItem value="2022">2022</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-                <Button>Filtrar</Button>
-            </div>
-
-          </div>
+        <div>
+          <Button>Filtrar</Button>
+        </div>
+      </div>
 
       <div className="">
         <ContratosTable />
