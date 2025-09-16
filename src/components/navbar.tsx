@@ -42,8 +42,8 @@ export function Navbar() {
         className={ pathname == "/" ? `font-black ` : `` }
         onClick={ () => router.push("/") }>
           Dashboard</li>
-      <li className={ pathname == "/relatorios" ? `font-black ` : `` }
-        onClick={ () => router.push("/relatorios") }>
+      <li className={ pathname == "/reports" ? `font-black ` : `` }
+        onClick={ () => router.push("/reports") }>
         Recibos
       </li>
       <li className={ pathname == "/commissioned" ? `font-black ` : `` }

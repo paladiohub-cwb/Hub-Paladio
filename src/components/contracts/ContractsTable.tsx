@@ -55,7 +55,9 @@ export default function ContratosTable() {
     const fetchData = async () => {
       const res = await fetch("/api/contracts/readAll");
       const data: ContratoAgrupado[] = await res.json();
-      setContratos(data);
+      
+      setContratos(data)
+      console.log("contratos", data)
 
       const allCats = new Set<string>();
       data.forEach((c) => {
@@ -80,6 +82,8 @@ export default function ContratosTable() {
     setDrawerOpen(false);
   };
 
+  
+
   return (
     <>
       <Table>
@@ -99,6 +103,8 @@ export default function ContratosTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
+            
+        
           {contratos.map((c) => (
             <TableRow
               key={c.contrato}
@@ -110,7 +116,7 @@ export default function ContratosTable() {
               <TableCell>{c.vendedor}</TableCell>
               <TableCell>{c.parcela}</TableCell>
               <TableCell>{c.credito}</TableCell>
-              {/* <TableCell>{c.detalhes.status}</TableCell> */}
+              <TableCell>{c.detalhes.status}</TableCell>
               <TableCell className="font-bold text-green-500">
                 R${c.total.toLocaleString("pt-BR")}
               </TableCell>
@@ -121,6 +127,8 @@ export default function ContratosTable() {
               ))}
             </TableRow>
           ))}
+
+
         </TableBody>
       </Table>
 
