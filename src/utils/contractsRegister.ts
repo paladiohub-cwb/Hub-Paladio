@@ -105,3 +105,19 @@ export const numberPreprocess =
       return undefined;
     }
   };
+
+export function parseBrazilianCurrencyToNumber(input: unknown): number {
+  if (typeof input === "number") return input;
+  const s = String(input ?? "").trim();
+  if (!s) return NaN;
+
+  // Remove tudo que não seja dígito, vírgula, ponto ou sinal negativo
+  // Em seguida remove os pontos (milhares) e converte a vírgula decimal para ponto
+  const cleaned = s
+    .replace(/[^\d,\-\.]/g, "") // tira "R$ ", espaços, letras, etc
+    .replace(/\./g, "") // remove separador de milhar
+    .replace(/,/g, "."); // vírgula decimal -> ponto
+
+  const n = Number(cleaned);
+  return Number.isFinite(n) ? n : NaN;
+}

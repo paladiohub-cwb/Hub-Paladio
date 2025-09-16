@@ -6,7 +6,11 @@ import {
   toDecimal,
 } from "@/utils/contractsRegister";
 
-import { numberPreprocess } from "@/utils/contractsRegister";
+import {
+  numberPreprocess,
+  parseBrazilianCurrencyToNumber,
+} from "@/utils/contractsRegister";
+import { convertStringInNumber } from "@/utils/convertStringInNumber";
 
 export const rawContratoSchema = z.object({
   Status: z.preprocess(
@@ -106,23 +110,35 @@ export const rawContratoSchema = z.object({
   ),
 
   aviso: z.string().optional(),
+
+  doubleCheck: z.number().optional(),
 });
 
-export const contratoSchema = rawContratoSchema.transform((data) => ({
-  status: data.Status,
-  valorBruto: data["Valor bruto"],
-  comissao: data["% comissão"],
-  nomePontoDeVenda: data["Nome ponto de venda"],
-  grupo: data.Grupo,
-  cota: data.Cota,
-  segmento: data.Segmento,
-  contrato: data.Contrato,
-  creditoAtualizado: data["Crédito atualizado"],
-  vendedor: data.Vendedor,
-  equipe: data.Equipe,
-  dataDaVenda: data["Data da venda"],
-  parcela: data.Parcela,
-  nomeDoCliente: data["Nome do Cliente"],
-  categoria: data.Categoria,
-  aviso: data.aviso,
-}));
+export const contratoSchema = rawContratoSchema.transform((data) => {
+  const creditoAtualizadoNumber = parseBrazilianCurrencyToNumber(
+    data["Crédito atualizado"]
+  );
+
+  const doubleCheckRaw = creditoAtualizadoNumber * data["% comissão"];
+  const doubleCheck = toDecimal(doubleCheckRaw);
+
+  return {
+    status: data.Status,
+    valorBruto: data["Valor bruto"],
+    comissao: data["% comissão"],
+    nomePontoDeVenda: data["Nome ponto de venda"],
+    grupo: data.Grupo,
+    cota: data.Cota,
+    segmento: data.Segmento,
+    contrato: data.Contrato,
+    creditoAtualizado: data["Crédito atualizado"],
+    vendedor: data.Vendedor,
+    equipe: data.Equipe,
+    dataDaVenda: data["Data da venda"],
+    parcela: data.Parcela,
+    nomeDoCliente: data["Nome do Cliente"],
+    categoria: data.Categoria,
+    aviso: data.aviso,
+    doubleCheck,
+  };
+});
