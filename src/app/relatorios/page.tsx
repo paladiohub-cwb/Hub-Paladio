@@ -5,6 +5,13 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import ContratosTable from "@/components/contracts/ContractsTable";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function Relatorios() {
   const [jsonData, setJsonData] = useState<any[]>([]);
@@ -95,7 +102,8 @@ export default function Relatorios() {
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div className="w-7xl bg-[rgba(255,255,255,0.1)] relative m-auto p-4 rounded-2xl" >
+
       <h1>Upload de Relatórios</h1>
       <Button
         variant="destructive"
@@ -132,7 +140,7 @@ export default function Relatorios() {
       )}
 
       {loading && (
-        <div className="w-full bg-gray-200 rounded h-4 my-4">
+        <div className="w-full bg-gray-200 rounded ">
           <div
             className="bg-blue-600 h-4 rounded"
             style={{ width: `${progress}%` }}
@@ -140,14 +148,73 @@ export default function Relatorios() {
         </div>
       )}
 
-      <div className="flex justify-center items-center mt-4">
+      <div className="flex justify-center items-center ">
         <Button variant="default" onClick={handleSendToAPI} disabled={loading}>
           {loading ? `Enviando... ${progress}%` : "Registrar contratos"}
         </Button>
       </div>
 
-      <div className="p-8">
-        <h1 className="text-xl font-bold mb-4">Relatórios</h1>
+      <div className="flex items-center gap-4 mb-4">
+
+            <div className="flex gap-2 items-center">
+              Selecione a loja: 
+              <Select>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Loja" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cajuru">Cajuru</SelectItem>
+                  <SelectItem value="boa vista">Boa Vista</SelectItem>
+                  <SelectItem value="curitiba">Curitiba</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-2 items-center">
+              Mês: 
+              <Select>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Mês" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Janeiro">Janeiro</SelectItem>
+                  <SelectItem value="Fevereiro">Fevereiro</SelectItem>
+                  <SelectItem value="Março">Março</SelectItem>
+                  <SelectItem value="Abril">Abril</SelectItem>
+                  <SelectItem value="Maio">Maio</SelectItem>
+                  <SelectItem value="Junho">Junho</SelectItem>
+                  <SelectItem value="Julho">Julho</SelectItem>
+                  <SelectItem value="Agosto">Agosto</SelectItem>
+                  <SelectItem value="Setembro">Setembro</SelectItem>
+                  <SelectItem value="Outubro">Outubro</SelectItem>
+                  <SelectItem value="Novembro">Novembro</SelectItem>
+                  <SelectItem value="Dezembro">Dezembro</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-2 items-center">
+              Ano: 
+              <Select>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Ano" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2025">2025</SelectItem>
+                  <SelectItem value="2024">2024</SelectItem>
+                  <SelectItem value="2023">2023</SelectItem>
+                  <SelectItem value="2022">2022</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+                <Button>Filtrar</Button>
+            </div>
+
+          </div>
+
+      <div className="">
         <ContratosTable />
       </div>
     </div>

@@ -84,14 +84,14 @@ export default function ContratosTable() {
     <>
       <Table>
         <TableCaption>Lista de contratos agrupados</TableCaption>
-        <TableHeader>
-          <TableRow>
+        <TableHeader className="">
+          <TableRow className="uppercase text-[12px]]">
             <TableHead>Contrato</TableHead>
             <TableHead>Cliente</TableHead>
             <TableHead>Vendedor</TableHead>
             <TableHead>Parcela</TableHead>
             <TableHead>Crédito</TableHead>
-            <TableHead>Status</TableHead>
+            {/* <TableHead>Status</TableHead> */}
             <TableHead>Total</TableHead>
             {categorias.map((cat) => (
               <TableHead key={cat}>{cat}</TableHead>
@@ -110,7 +110,7 @@ export default function ContratosTable() {
               <TableCell>{c.vendedor}</TableCell>
               <TableCell>{c.parcela}</TableCell>
               <TableCell>{c.credito}</TableCell>
-              <TableCell>{c.detalhes.status}</TableCell>
+              {/* <TableCell>{c.detalhes.status}</TableCell> */}
               <TableCell className="font-bold text-green-500">
                 R${c.total.toLocaleString("pt-BR")}
               </TableCell>
