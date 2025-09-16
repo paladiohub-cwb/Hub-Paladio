@@ -4,6 +4,7 @@ const CARGOS = ["CONSULTOR", "SUPERVISOR", "GESTOR"] as const;
 type Cargo = (typeof CARGOS)[number];
 
 export const registerSchema = z.object({
+  id: z.string().uuid({ message: "ID deve ser um UUID válido." }).optional(),
   name: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
   email: z.string().email({ message: "E-mail inválido" }),
   password: z

@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
     const failures: { index: number; errors: string[]; original: unknown }[] =
       [];
 
-    // conecta no banco
     const client = await clientPromise;
     const db = client.db("hub"); // nome do banco
     const collection = db.collection<Contrato>("contratos");
