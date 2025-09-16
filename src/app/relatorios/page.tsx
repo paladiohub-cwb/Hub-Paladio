@@ -10,6 +10,9 @@ export default function Relatorios() {
   const [jsonData, setJsonData] = useState<any[]>([]);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<
+    { index: number; error: string; contrato?: any }[]
+  >([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,6 +28,7 @@ export default function Relatorios() {
       const parsedData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
       setJsonData(parsedData as any[]);
+      setErrors([]); // limpa erros ao subir novo arquivo
     };
 
     reader.readAsArrayBuffer(file);
@@ -38,6 +42,7 @@ export default function Relatorios() {
 
     setLoading(true);
     setProgress(0);
+    setErrors([]);
 
     try {
       for (let i = 0; i < jsonData.length; i++) {
@@ -45,18 +50,36 @@ export default function Relatorios() {
         const res = await fetch("/api/contracts/registerInBulk", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(contrato), // envia 1 contrato por vez
+          body: JSON.stringify(contrato),
         });
 
         if (!res.ok) {
-          console.error(`Erro no contrato ${i + 1}`, await res.json());
+          const errorData = await res.json();
+          const messageFailures = (errorData.failures ?? [])
+            .map((f: any) => (f.errors ?? []).join("; "))
+            .join(" | ");
+
+          setErrors((prev) => [
+            ...prev,
+            {
+              index: i + 1,
+              error: errorData.message
+                ? `${errorData.message} — ${messageFailures}`
+                : messageFailures || "Erro desconhecido",
+              contrato,
+            },
+          ]);
         }
 
-        // Atualiza porcentagem
         setProgress(Math.round(((i + 1) / jsonData.length) * 100));
       }
 
-      toast.success("Todos contratos foram processados!");
+      if (errors.length === 0) {
+        toast.success("Todos contratos foram processados!");
+      } else {
+        toast.error("Alguns contratos falharam. Verifique a lista de erros.");
+      }
+
       setJsonData([]);
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
@@ -113,30 +136,34 @@ export default function Relatorios() {
         style={{ marginBottom: "1rem" }}
       />
 
-      {jsonData.length > 0 && (
-        <div className="bg-green-500 p-2 rounded">
-          <h2>Resultado JSON (preview):</h2>
-          <pre
-            style={{
-              background: "#111",
-              color: "#0f0",
-              padding: "1rem",
-              borderRadius: "8px",
-              maxHeight: "400px",
-              overflow: "auto",
-            }}
-          >
-            {JSON.stringify(jsonData, null, 2)}
-          </pre>
-        </div>
-      )}
-
       {loading && (
         <div className="w-full bg-gray-200 rounded h-4 my-4">
           <div
             className="bg-blue-600 h-4 rounded"
             style={{ width: `${progress}%` }}
           ></div>
+        </div>
+      )}
+
+      {errors.length > 0 && (
+        <div className="bg-red-100 border border-red-400 text-red-800 p-4 rounded mt-4">
+          <h2 className="font-bold mb-2">Erros encontrados:</h2>
+          <ul className="list-disc pl-5">
+            {errors.map((err, idx) => {
+              return (
+                <li key={idx}>
+                  <span className="font-semibold">Linha {err.index}:</span>{" "}
+                  {err.error}
+                  {err.contrato?.contrato && (
+                    <span className="text-gray-600">
+                      {" "}
+                      (Contrato: {err.contrato.contrato})
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
 

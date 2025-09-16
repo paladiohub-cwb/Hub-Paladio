@@ -1,3 +1,5 @@
+// /lib/schemas/contracts.ts (exemplo)
+import { z } from "zod";
 import {
   parseDateToISO,
   toInt,
@@ -5,48 +7,123 @@ import {
   toPercentage,
   toDecimal,
 } from "@/utils/contractsRegister";
-import { z, ZodError } from "zod";
 
-// Zod schema para validar os campos com nomes 'sujos'
+/**
+ * Helper: prepara um número usando sua função utilitária (toInt/toNumber/etc).
+ * Se o util retornar algo não-numérico, devolve NaN — assim conseguimos detectar
+ * depois com .refine(...) e devolver mensagem amigável.
+ */
+const numberPreprocess = (fn: (v: unknown) => number) => (v: unknown) => {
+  if (v === null || v === undefined || v === "") return undefined;
+  try {
+    const n = fn(v);
+    return Number.isFinite(n) ? n : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
 export const rawContratoSchema = z.object({
   Status: z.preprocess(
-    (v) => (v == null ? "" : String(v).trim()),
-    z.string().min(1)
+    (v) => String(v ?? "").trim(),
+    z.string().min(1, {
+      message: "Status é obrigatório",
+    })
   ),
-  "Valor bruto": z.preprocess((v) => toNumber(v), z.number()),
-  "% comissão": z.preprocess((v) => toDecimal(v), z.number().min(0).max(100)),
+
+  "Valor bruto": z.preprocess(
+    numberPreprocess(toNumber),
+    z.number().refine((n) => !Number.isNaN(n), {
+      message: "Valor bruto deve ser um número válido",
+    })
+  ),
+
+  "% comissão": z.preprocess(numberPreprocess(toDecimal), z.number()),
+
   "Nome ponto de venda": z.preprocess(
-    (v) => (v == null ? "" : String(v).trim()),
-    z.string().min(1)
+    (v) => String(v ?? "").trim(),
+    z.string().min(1, { message: "Nome do ponto de venda é obrigatório" })
   ),
-  Grupo: z.preprocess((v) => toInt(v), z.number().int()),
-  Cota: z.preprocess((v) => toInt(v), z.number().int()),
+
+  Grupo: z.preprocess(
+    numberPreprocess(toInt),
+    z.number().refine((n) => !Number.isNaN(n) && Number.isInteger(n), {
+      message: "Grupo deve ser um número inteiro",
+    })
+  ),
+
+  Cota: z.preprocess(
+    numberPreprocess(toInt),
+    z.number().refine((n) => !Number.isNaN(n) && Number.isInteger(n), {
+      message: "Cota deve ser um número inteiro",
+    })
+  ),
+
   Segmento: z.preprocess(
-    (v) => (v == null ? "" : String(v).trim()),
-    z.string().min(1)
+    (v) => String(v ?? "").trim(),
+    z.string().min(1, { message: "Segmento é obrigatório" })
   ),
-  Contrato: z.preprocess((v) => toInt(v), z.number().int()),
+
+  Contrato: z.preprocess(
+    numberPreprocess(toInt),
+    z
+      .number({
+        error: "Deve ser apenas numeros inteiros",
+      })
+      .int()
+  ),
+
   "Crédito atualizado": z.preprocess(
-    (v) => (v == null ? "" : String(v).trim()),
-    z.string()
+    (v) => String(v ?? "").trim(),
+    z.string().min(1, { message: "Crédito atualizado é obrigatório" })
   ),
-  Vendedor: z.preprocess((v) => toInt(v), z.number().int()),
-  Equipe: z.preprocess((v) => toInt(v), z.number().int()),
-  "Data da venda": z.preprocess((v) => parseDateToISO(v), z.string()),
-  Parcela: z.preprocess((v) => toInt(v), z.number().int()),
+
+  Vendedor: z.preprocess(
+    (v) => toInt(v),
+    z
+      .number({ error: "Deve ser apenas numeros inteiros" })
+      .refine((n) => !Number.isNaN(n) && Number.isInteger(n), {
+        message: "O campo 'Vendedor' deve conter apenas números inteiros",
+      })
+  ),
+
+  Equipe: z.preprocess(
+    (v) => toInt(v),
+    z
+      .number({ error: "Deve ser apenas numeros inteiros" })
+      .refine((n) => !Number.isNaN(n) && Number.isInteger(n), {
+        message: "O campo 'Equipe' deve conter apenas números inteiros",
+      })
+  ),
+
+  "Data da venda": z.preprocess(
+    (v) => parseDateToISO(v), // parseDateToISO deve retornar string ISO ou falsy
+    z.string().refine((s) => !!s, { message: "Data da venda inválida" })
+  ),
+
+  Parcela: z.preprocess(
+    numberPreprocess(toInt),
+    z
+      .number()
+      .refine((n) => !Number.isNaN(n) && Number.isInteger(n) && n >= 0, {
+        message: "Parcela deve ser um número inteiro não-negativo",
+      })
+  ),
+
   "Nome do Cliente": z.preprocess(
-    (v) => (v == null ? "" : String(v).trim()),
-    z.string().min(1)
+    (v) => String(v ?? "").trim(),
+    z.string().min(1, { message: "Nome do Cliente é obrigatório" })
   ),
+
   Categoria: z.preprocess(
-    (v) => (v == null ? "" : String(v).trim()),
-    z.string().min(1)
+    (v) => String(v ?? "").trim(),
+    z.string().min(1, { message: "Categoria é obrigatória" })
   ),
+
   aviso: z.string().optional(),
-  // doubleCheckValue: z.number(),
 });
 
-// Zod schema que faz o 'transform' para nomes limpos (camelCase)
+// transforma para camelCase (mantendo mensagens do raw schema)
 export const contratoSchema = rawContratoSchema.transform((data) => ({
   status: data.Status,
   valorBruto: data["Valor bruto"],
@@ -64,5 +141,4 @@ export const contratoSchema = rawContratoSchema.transform((data) => ({
   nomeDoCliente: data["Nome do Cliente"],
   categoria: data.Categoria,
   aviso: data.aviso,
-  // doubleCheckValue: data.doubleCheckValue,
 }));
