@@ -67,9 +67,43 @@ export default function Relatorios() {
     }
   };
 
+  const handleDeleteAllContracts = async () => {
+    if (
+      !confirm(
+        "Tem certeza que deseja excluir TODOS os contratos? Esta ação não pode ser desfeita."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/contracts/deleteBulk", {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Erro desconhecido");
+      }
+
+      const data = await res.json();
+      toast.success(data.message);
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Erro ao excluir contratos");
+    }
+  };
+
   return (
     <div style={{ padding: "2rem" }}>
       <h1>Upload de Relatórios</h1>
+      <Button
+        variant="destructive"
+        onClick={() => handleDeleteAllContracts()}
+        disabled={loading}
+      >
+        Excluir todos contratos
+      </Button>
 
       <input
         type="file"
