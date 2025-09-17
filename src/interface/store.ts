@@ -1,4 +1,5 @@
 export interface StoreType {
-  id?: string;
+  id: string | undefined;
   nome: string;
+  storeId?: string | undefined;
 }

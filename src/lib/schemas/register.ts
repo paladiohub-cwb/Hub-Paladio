@@ -6,6 +6,7 @@ const CARGOS = [
   "SUPERVISOR",
   "AUTORIZADO",
   "LICENCIADO",
+  "INDICADOR",
 ] as const;
 
 function normalizeCargo(cargo: string): string {
@@ -17,19 +18,31 @@ function normalizeCargo(cargo: string): string {
 
 export const registerSchema = z.object({
   id: z.string().uuid({ message: "ID deve ser um UUID válido." }).optional(),
-  nome: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
-  email: z.string().email({ message: "E-mail inválido" }),
+
+  nome: z.preprocess((val) => {
+    if (typeof val !== "string") return ""; // força string vazia se undefined
+    return val.toLowerCase().trim(); // lowercase + remove espaços extras
+  }, z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" })),
+
+  email: z.preprocess((val) => {
+    if (typeof val !== "string") return "";
+    return val.toLowerCase().replace(/\s/g, ""); // lowercase + remove espaços
+  }, z.string().email({ message: "E-mail inválido" })),
+
   cod: z.number({ message: "Apenas números." }),
   codSupervisor: z.number({ message: "Apenas números." }).optional(),
+
   password: z
     .string()
     .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
+
   cargo: z
     .preprocess(
       (val) => (typeof val === "string" ? normalizeCargo(val) : val),
       z.enum(CARGOS, { message: "Cargo inválido" })
     )
     .default("CONSULTOR"),
+
   ativo: z.boolean().default(true).optional(),
   comissao: z.number({ message: "Apenas números" }).default(0.02).optional(),
 });
