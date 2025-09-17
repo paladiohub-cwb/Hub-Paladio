@@ -99,33 +99,40 @@ const categoriasList = [
     id: 89812, nome:"LICENCIADO", 
     users: 
     [
-      { id: 89809, nome: "LOJA", part: 0.01 }, 
+      { id: 89809, nome: "LOJA", part: 0.010 }, 
     ],
   },
   {
     id: 89812, nome:"LICENCIADO 1,50%", 
     users: 
     [
-      {id: 89809, nome: "LOJA", part: 0.0050}, 
-      {id: 3030, nome: "Bruno", part: 1},
+      {id: 89809, nome: "LOJA", part: 0.010}, 
+      {id: 3030, nome: "Bruno", part: 0.0050},
     ],
   },
   {
     id: 89812, nome:"LICENCIADO 0,80%", 
     users: 
     [
-      {id: 89809, nome: "Felipe Otelakoski", part: 0.0333}, 
+      {id: 89809, nome: "Felipe Otelakoski", part: 0.0080}, 
     ],
   },
   {
     id: 89812, nome:"LICENCIADO 0,50%", 
     users: 
     [
-      {id: 89809, nome: "Felipe Otelakoski", part: 0.050}, 
+      {id: 89809, nome: "Felipe Otelakoski", part: 0.0050}, 
     ],
   },
   {
     id: 89812, nome:"AUTORIZADO 2,00%", 
+    users: 
+    [
+      {id: 89809, nome: "Felipe Otelakoski", part: 0.020}, 
+    ],
+  },
+  {
+    id: 89812, nome:"VENDEDOR", 
     users: 
     [
       {id: 89809, nome: "Felipe Otelakoski", part: 0.02}, 
@@ -133,24 +140,31 @@ const categoriasList = [
   }
 ]
 
+const vendedores = [ {id: 91539, nome: "Felipe Otelakoski", part: 0.02} ]
+
 const getUsersByCategoria = (categoria: string) => {
   const cat = categoriasList.find(c => c.nome.toLowerCase() == categoria.toLowerCase());
   return cat?.users ?? []; // [] se não achar
-};
-
-function calcConstracts(contracts, comissionado){
-
-  const { status, detalhes: { vendedor, categoria, creditoAtualizado, comissao, valorBruto }  } = contracts
-
-  console.log(contracts)
-  console.log(categoria)
-  console.log(comissionado)
-
-
-
-  return console.log( { nome, calc, valorBruto} )
-
 }
+
+function calcConstracts(contracts, comissionado, cod){
+
+    const { status, detalhes: { vendedor, categoria, creditoAtualizado, comissao, valorBruto }  } = contracts
+
+    // console.log(contracts)
+    // console.log(categoria)
+    // console.log(comissionado)
+    console.log(vendedor, vendedores.find( c => c.id == parseInt(vendedor) )?.id)
+
+    const resultado = (categoria === "AUTORIZADO 2,00%" || categoria === "VENDEDOR")
+    ? { calc: vendedores.find( c => c.id == parseInt(vendedor) )?.part * creditoAtualizado, id: vendedores.find( c => c.id == parseInt(vendedor) )?.id, nome: vendedores.find( c => c.id == parseInt(vendedor) )?.nome }
+      // ? { id: comissionado[0].id,name: comissionado[0].nome, calc: comissionado[0].part * creditoAtualizado } 
+      //trocar por funcao de buscar vendedor com o código do contrato
+      : comissionado.map( ( { part, id, nome } ) =>  ({ id, name: nome, calc: part * creditoAtualizado }) )
+
+    console.log(resultado)
+    return resultado?.length ? resultado : []
+  }
 
   return (
     <>
@@ -171,13 +185,12 @@ function calcConstracts(contracts, comissionado){
                 </TableHead>
               ))}
 
-            <TableHead><div className="w-[100px]">BT CALCULAR</div> </TableHead>
+            {/* <TableHead><div className="w-[100px]">BT CALCULAR</div> </TableHead> */}
               
           </TableRow>
         </TableHeader>
         <TableBody>
             
-        
           {contratos.map((c) => (
             <TableRow
               key={c.contrato}
@@ -193,14 +206,43 @@ function calcConstracts(contracts, comissionado){
               <TableCell className="font-bold">
                 R${c.total.toLocaleString("pt-BR")}
               </TableCell>
-                {categorias.map((cat) => (
+                {/* {categorias.map((cat) => { console.log(cat) 
+                return (
                   <TableCell key={cat}>
-                    R${(c.categorias[cat] || 0).toLocaleString("pt-BR")}
+                    R$ {(c.categorias[cat] || 0).toLocaleString("pt-BR")} 
                   </TableCell>
-                ))}
-              <TableCell>
-                <Button onClick={() => calcConstracts(c, getUsersByCategoria(c.detalhes.categoria))}>Calcular</Button>
-              </TableCell>
+                )})} */}
+
+                {categorias.map((cat) => { 
+
+                return (
+
+                  <TableCell key={cat}>
+                    {/* R$ {(c.categorias[cat] || 0).toLocaleString("pt-BR")} 
+                     */}
+
+                    {/* { c.categorias[cat] ? "tem" : "não" } */}
+
+                     {/* { ( vendedores.find( cod => cod.id == c.vendedor )?.id == c.vendedor ) 
+                        ? 'R$0' // nada a mostrar
+                        : calcConstracts(c, getUsersByCategoria(cat)).map(({ id, name, calc }) => (
+                            <div key={id}>
+                              {name} — {calc.toLocaleString("pt-BR")}
+                            </div>
+                          ))
+                      } */}
+
+                      { calcConstracts(c, getUsersByCategoria(cat)).map(({ id, name, calc }) => (
+                            <div key={id}>
+                              {name} — {calc.toLocaleString("pt-BR")}
+                            </div>
+                          )
+                      )}
+
+                  </TableCell>
+                )})}
+
+      
             </TableRow>
           ))}
 
