@@ -144,8 +144,66 @@ export default function Relatorios() {
     }
   };
 
+
+  const vendedores = {id: 89809, nome: "Felipe Otelakoski", part: 0.02}
+  
+  const categorias = [
+      {
+        id: 89812, nome:"LICENCIADO", 
+        users: 
+        [
+          { id: 89809, nome: "LOJA", part: 0.01 }, 
+        ],
+      },
+      {
+        id: 89812, nome:"LICENCIADO 1,50%", 
+        users: 
+        [
+          {id: 89809, nome: "LOJA", part: 0.0050}, 
+          {id: 3030, nome: "Bruno", part: 1},
+        ],
+      },
+      {
+        id: 89812, nome:"LICENCIADO 0,80%", 
+        users: 
+        [
+          {id: 89809, nome: "Felipe Otelakoski", part: 0.0333}, 
+        ],
+      },
+      {
+        id: 89812, nome:"LICENCIADO 0,50%", 
+        users: 
+        [
+          {id: 89809, nome: "Felipe Otelakoski", part: 0.050}, 
+        ],
+      }
+    ]
+
+  const contract = 
+    {
+      creditoAtualizado: 80000,
+      categoria: "AUTORIZADO 2,00%%",
+      status: "comissão paga",
+      comissao: 0.0333,
+      valorBruto: 2664.00
+    }
+  
+
+  function calcConstracts(contracts, comissionado){
+
+    const { creditoAtualizado, categoria, status, comissao, valorBruto } = contracts
+    const { id, nome, part } = comissionado
+    const calc = creditoAtualizado * part
+  
+    return console.log( {id, nome, calc, valorBruto} )
+
+  }
+
+
   return (
     <div className="w-7xl bg-[rgba(255,255,255,0.1)] relative m-auto p-4 rounded-2xl flex flex-col">
+
+      <Button onClick={() => calcConstracts(contract, vend)}>Calcular</Button>
 
       <ul className="relative flex right-0 gap-4 justify-end mb-3">
         <li>
@@ -343,7 +401,11 @@ export default function Relatorios() {
           </div>
 
       <div className="">
+
+
         <ContratosTable />
+
+
       </div>
     </div>
   );
