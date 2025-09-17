@@ -6,4 +6,6 @@ export interface userStoreType {
   userName: string;
   cargo: string;
   dataEntrada: string;
+  cnpjLoja?: string;
+  codEquipe: number;
 }

@@ -5,6 +5,7 @@ import { storeSchema } from "@/lib/schemas/store";
 import { userStoreSchema } from "@/lib/schemas/userStore";
 import { v4 as uuidv4 } from "uuid";
 import { StoreType } from "@/interface/store";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,7 +31,14 @@ export async function POST(req: NextRequest) {
     for (const [index, raw] of data.entries()) {
       try {
         // --- 1. Criar ou validar store ---
+        if (!process.env.PASSWORD_BULK_REGISTER) {
+          throw new Error("PASSWORD_BULK_REGISTER não está definida!");
+        }
 
+        const hashedPassword = await bcrypt.hash(
+          process.env.PASSWORD_BULK_REGISTER,
+          10
+        );
         const parsedStore = storeSchema.parse({ nome: raw.loja });
 
         let store = await storeCollection.findOne({ nome: parsedStore.nome });
@@ -59,7 +67,7 @@ export async function POST(req: NextRequest) {
           nome: raw.nome,
           email: raw.email,
           ativo: raw.ativo === "Sim",
-          password: "123456",
+          password: hashedPassword,
           cargo: raw.cargo,
           comissao: raw.comissao,
           stores: [userStoreData],
