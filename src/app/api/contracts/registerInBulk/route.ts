@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import type { Contrato } from "@/interface/contracts";
 import { contratoSchema } from "@/lib/schemas/contracts";
-import { convertStringInNumber } from "@/utils/convertStringInNumber";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,7 +18,6 @@ export async function POST(req: NextRequest) {
     const failures: { index: number; errors: string[]; original: unknown }[] =
       [];
 
-    // conecta no banco
     const client = await clientPromise;
     const db = client.db("hub"); // nome do banco
     const collection = db.collection<Contrato>("contratos");
@@ -58,11 +56,7 @@ export async function POST(req: NextRequest) {
         //   parsed.data.aviso = `Última parcela deste contrato foi ${ultimaParcela}, você pulou para ${parsed.data.parcela}`;
         // }
 
-        const creditoAtualizadoNumber = convertStringInNumber(
-          parsed.data.creditoAtualizado
-        );
-        parsed.data.creditoAtualizado = creditoAtualizadoNumber as any;
-
+        // parsed.data já vem pronto com creditoAtualizado como number
         newContratos.push(parsed.data);
       } else {
         const zErrors = parsed.error.issues.map((e) => {

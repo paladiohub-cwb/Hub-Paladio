@@ -1,5 +1,4 @@
-// Tipagem do contrato com nomes 'sujos'
-export type RawContrato = {
+export interface RawContrato {
   Status: string;
   "Valor bruto": number;
   "% comissão": number;
@@ -16,10 +15,10 @@ export type RawContrato = {
   "Nome do Cliente": string;
   Categoria: string;
   aviso?: string;
-};
+}
 
-// Tipagem do contrato com nomes 'limpos' (camelCase)
-export type Contrato = {
+export interface Contrato {
+  _id?: string;
   status: string;
   valorBruto: number;
   comissao: number;
@@ -28,12 +27,13 @@ export type Contrato = {
   cota: number;
   segmento: string;
   contrato: number;
-  creditoAtualizado: string;
+  creditoAtualizado: number;
   vendedor: number;
   equipe: number;
   dataDaVenda: string;
   parcela: number;
   nomeDoCliente: string;
   categoria: string;
-  aviso?: string;
-};
+  aviso?: string | null;
+  doubleCheck: number;
+}
