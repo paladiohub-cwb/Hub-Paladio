@@ -3,7 +3,7 @@ import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import {
   CategoriesType,
-  userDistribuitionCategorie,
+  userDistributionCategorie,
 } from "@/interface/categories";
 
 const DB_NAME = "hub";
@@ -11,12 +11,11 @@ const COLLECTION_CATEGORIES = "categories";
 const COLLECTION_USERS = "users";
 const COLLECTION_STORES = "store";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: Request) {
   try {
     const { userId, storeId, part } = await req.json();
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id") as string;
 
     if (!userId && !storeId) {
       return NextResponse.json(
@@ -33,7 +32,7 @@ export async function POST(
     );
 
     // Verifica se a categoria existe
-    const category = await collectionCategories.findOne({ id: params.id });
+    const category = await collectionCategories.findOne({ id: id });
     if (!category) {
       return NextResponse.json(
         { error: "Categoria não encontrada" },
@@ -63,7 +62,7 @@ export async function POST(
       );
     }
 
-    const newUser: userDistribuitionCategorie = {
+    const newUser: userDistributionCategorie = {
       id: String(record._id),
       nome: record.nome ?? record.name ?? "Sem nome",
       part: part,
@@ -72,11 +71,11 @@ export async function POST(
 
     // Atualiza categoria adicionando o novo usuário/loja
     await collectionCategories.updateOne(
-      { id: params.id },
+      { id: id },
       { $push: { users: newUser } }
     );
 
-    return NextResponse.json({ id: params.id, user: newUser }, { status: 200 });
+    return NextResponse.json({ id: id, user: newUser }, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
