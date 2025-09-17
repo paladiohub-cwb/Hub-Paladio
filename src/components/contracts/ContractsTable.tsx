@@ -249,8 +249,9 @@ function calcConstracts(contracts, comissionado, cod){
 
         </TableBody>
       </Table>
-
-      <Drawer >
+      {/* open={drawerOpen} onOpenChange={setDrawerOpen} */}
+      
+      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} >
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>
