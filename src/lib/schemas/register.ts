@@ -61,7 +61,12 @@ const storeUserSchema = z.object({
   idUser: z.string().optional(),
   idStore: z.string().optional(),
   cod: z.number({ message: "Apenas números." }),
-  cargo: z.enum(CARGOS).refine((cargo) => cargo.toUpperCase()),
+  cargo: z
+    .preprocess(
+      (val) => (typeof val === "string" ? normalizeCargo(val) : val),
+      z.enum(CARGOS, { message: "Cargo inválido" })
+    )
+    .default("CONSULTOR"),
   storeName: z.string(),
   userName: z.string(),
   codSupervisor: z.number({ message: "Apenas números" }).optional(),
@@ -69,12 +74,25 @@ const storeUserSchema = z.object({
 
 export const registerInBulkSchema = z.object({
   id: z.string().uuid({ message: "ID deve ser um UUID válido." }).optional(),
-  nome: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
-  email: z.string().email({ message: "E-mail inválido" }),
+  nome: z.preprocess((val) => {
+    if (typeof val !== "string") return "";
+    return val.toLowerCase().trim();
+  }, z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" })),
+
+  email: z.preprocess((val) => {
+    if (typeof val !== "string") return "";
+    return val.toLowerCase().replace(/\s/g, "");
+  }, z.string().email({ message: "E-mail inválido" })),
+
   password: z
     .string()
     .min(6, { message: "Senha deve ter pelo menos 6 caracteres" }),
-  cargo: z.enum(CARGOS, { message: "Cargo inválido" }).default("CONSULTOR"),
+  cargo: z
+    .preprocess(
+      (val) => (typeof val === "string" ? normalizeCargo(val) : val),
+      z.enum(CARGOS, { message: "Cargo inválido" })
+    )
+    .default("CONSULTOR"),
   ativo: z.boolean().default(true).optional(),
   comissao: z.number().default(0.02).optional(),
   stores: z.array(storeUserSchema).nonempty({
