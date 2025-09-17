@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import UsersList from "@/components/users/UsersList";
 
 export default function Users() {
   const [jsonData, setJsonData] = useState<any[]>([]);
@@ -122,6 +123,8 @@ export default function Users() {
           {loading ? `Enviando... ${progress}%` : "Registrar contratos"}
         </Button>
       </div>
+
+      <UsersList />
     </>
   );
 }
